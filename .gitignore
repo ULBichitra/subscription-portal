@@ -27,3 +27,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Graphify AST cache and runtime locks
+graphify-out/
+.graphify_cache/
