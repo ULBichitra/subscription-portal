@@ -1,0 +1,35 @@
+{
+  "name": "UnivLabs CCP Surgical Portal",
+  "short_name": "UnivLabs CCP",
+  "description": "UnivLabs CCP Surgical Cockpit & Medical Device Subscription Management System",
+  "id": "/?pwa=univlabs-ccp",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "prefer_related_applications": false,
+  "categories": ["medical", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

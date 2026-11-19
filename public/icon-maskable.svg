@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Full bleed background for safe zone crop -->
+  <rect width="512" height="512" fill="#09090b"/>
+  <defs>
+    <linearGradient id="shieldGradMask" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glowMask" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Outer Shield Outline within safe zone (80% circle) -->
+  <path d="M 256 100 L 368 146 C 368 258 320 340 256 386 C 192 340 144 258 144 146 Z" 
+        fill="url(#shieldGradMask)" opacity="0.15"/>
+  <path d="M 256 100 L 368 146 C 368 258 320 340 256 386 C 192 340 144 258 144 146 Z" 
+        fill="none" stroke="url(#shieldGradMask)" stroke-width="12" stroke-linejoin="round"/>
+        
+  <!-- Clinical Cross inside Shield -->
+  <!-- Vertical bar -->
+  <rect x="232" y="172" width="48" height="144" rx="12" fill="url(#shieldGradMask)" filter="url(#glowMask)"/>
+  <!-- Horizontal bar -->
+  <rect x="184" y="220" width="144" height="48" rx="12" fill="url(#shieldGradMask)" filter="url(#glowMask)"/>
+  
+  <!-- Central Pulse / Telemetry Core Indicator -->
+  <circle cx="256" cy="244" r="10" fill="#ffffff"/>
+</svg>
