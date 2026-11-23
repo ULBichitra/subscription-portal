@@ -1,61 +1,68 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-  server: {
-    port: 5173,
-    proxy: {
-      '/portal': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        ws: true,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const backendTarget = env.VITE_BACKEND_URL || env.BACKEND_PROXY_URL || 'http://127.0.0.1:8000'
+  const devPort = Number(env.PORT) || 5173
+
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+    ],
+    server: {
+      port: devPort,
+      proxy: {
+        '/portal': {
+          target: backendTarget,
+          changeOrigin: true,
+          ws: true,
+        },
+        '/api': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/auth': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/socket.io': {
+          target: backendTarget,
+          changeOrigin: true,
+          ws: true,
+        },
+        '/ws': {
+          target: backendTarget,
+          changeOrigin: true,
+          ws: true,
+        },
+        '/quality': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/v1': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/health': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
       },
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/auth': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/socket.io': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        ws: true,
-      },
-      '/ws': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        ws: true,
-      },
-      '/quality': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/v1': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-      },
-      '/health': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none',
       },
     },
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+    preview: {
+      port: devPort,
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      },
     },
-  },
-  preview: {
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'unsafe-none',
-    },
-  },
+  }
 })

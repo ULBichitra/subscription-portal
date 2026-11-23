@@ -124,7 +124,8 @@ export const FieldSupportModal: React.FC<FieldSupportModalProps> = ({ isOpen, on
   const [tokenData, setTokenData] = useState<SupportTokenResponse | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
-  const [mediatorHost, setMediatorHost] = useState('http://192.168.10.1:4200');
+  const defaultMediatorHost = (import.meta.env as any).VITE_MEDIATOR_DEFAULT_HOST || 'http://192.168.10.1:4200';
+  const [mediatorHost, setMediatorHost] = useState(defaultMediatorHost);
   const [showTokenRaw, setShowTokenRaw] = useState(false);
 
   useEffect(() => {

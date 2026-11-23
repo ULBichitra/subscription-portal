@@ -63,7 +63,8 @@ class RealtimeClient {
         wsUrl = wsBase.endsWith('/ws') ? wsBase : `${wsBase}/ws`;
       } else if (wsBase.startsWith('/')) {
         const protocol = typeof window !== 'undefined' && window.location?.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = typeof window !== 'undefined' && window.location?.host ? window.location.host : '127.0.0.1:8000';
+        const defaultHost = (import.meta.env as any).VITE_BACKEND_URL ? (import.meta.env as any).VITE_BACKEND_URL.replace(/^https?:\/\//i, '') : 'localhost:8000';
+        const host = typeof window !== 'undefined' && window.location?.host ? window.location.host : defaultHost;
         wsUrl = `${protocol}//${host}${wsBase.endsWith('/ws') ? wsBase : `${wsBase}/ws`}`;
       } else {
         wsUrl = `ws://${wsBase.endsWith('/ws') ? wsBase : `${wsBase}/ws`}`;
@@ -72,7 +73,9 @@ class RealtimeClient {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       wsUrl = `${protocol}//${window.location.host}/ws`;
     } else {
-      wsUrl = 'ws://127.0.0.1:8000/ws';
+      const backendUrl = (import.meta.env as any).VITE_BACKEND_URL;
+      const defaultWs = backendUrl ? backendUrl.replace(/^http/i, 'ws') : 'ws://localhost:8000';
+      wsUrl = `${defaultWs.replace(/\/+$/, '')}/ws`;
     }
 
     try {

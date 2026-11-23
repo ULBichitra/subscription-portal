@@ -142,7 +142,12 @@ export const getWsBaseUrl = (): string => {
     return `${protocol}//${window.location.host}`;
   }
 
-  return 'ws://127.0.0.1:8000';
+  const backendUrl = (import.meta.env as any).VITE_BACKEND_URL;
+  if (backendUrl) {
+    return backendUrl.replace(/^http/i, 'ws');
+  }
+
+  return 'ws://localhost:8000';
 };
 
 const api = axios.create({
