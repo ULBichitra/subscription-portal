@@ -21,7 +21,7 @@ import PwaInstallPrompt from './PwaInstallPrompt';
 interface HeaderProps {
   user: {
     username: string;
-    role: string;
+    role?: string;
     email?: string | null;
   };
   remainingSeconds?: number;
@@ -415,7 +415,7 @@ const Header: React.FC<HeaderProps> = ({ user, remainingSeconds: propRemainingSe
           >
             <div className="hidden md:flex flex-col items-end">
               <span className="text-sm font-medium text-white">{user.username}</span>
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">{user.role.replace('_', ' ')}</span>
+              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">{(user.role || 'user').replace('_', ' ')}</span>
             </div>
             <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.2)]">
               <User className="w-5 h-5 text-emerald-300" />
@@ -430,7 +430,7 @@ const Header: React.FC<HeaderProps> = ({ user, remainingSeconds: propRemainingSe
                 {user.email && <p className="text-xs text-zinc-400 truncate mt-0.5">{user.email}</p>}
                 <div className="flex items-center gap-2 mt-1.5">
                   <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    {user.role.replace('_', ' ')}
+                    {(user.role || 'user').replace('_', ' ')}
                   </span>
                   <span className="text-[10px] font-mono text-zinc-400 flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3 text-emerald-400" /> Part 11
