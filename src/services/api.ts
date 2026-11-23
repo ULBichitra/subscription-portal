@@ -1736,20 +1736,20 @@ export const normalizeLineItem = (item: any): InvoiceLineItem => {
 
 export const normalizeInvoice = (raw: any): Invoice => {
   if (!raw) return raw;
-  const subtotal = Number(raw.subtotal ?? 0);
-  const totalTax = Number(raw.totalTax ?? raw.tax_gst_amount ?? (subtotal * 0.18));
-  const totalPayable = Number(raw.totalPayable ?? raw.total_amount ?? raw.net_payable ?? (subtotal + totalTax));
+  const subtotal = Number(raw.subtotal ?? raw.base_amount ?? raw.subtotalAmount ?? 0);
+  const totalTax = Number(raw.totalTax ?? raw.taxGst18 ?? raw.tax_amount ?? raw.total_tax ?? raw.tax_gst_amount ?? (subtotal * 0.18));
+  const totalPayable = Number(raw.totalPayable ?? raw.totalAmount ?? raw.total_amount ?? raw.amount_due ?? raw.net_payable ?? (subtotal + totalTax));
   const amountPaid = Number(raw.amountPaid ?? raw.amount_paid ?? 0);
   const balanceDue = Number(raw.balanceDue ?? raw.balance_due ?? (totalPayable - amountPaid));
-  const billingMonth = raw.billingMonth ?? (raw.billing_period_start ? String(raw.billing_period_start).slice(0, 7) : new Date().toISOString().slice(0, 7));
-  const dueDate = raw.dueDate ?? (raw.billing_period_end ? String(raw.billing_period_end).slice(0, 10) : new Date().toISOString().slice(0, 10));
-  const issueDate = raw.issueDate ?? (raw.created_at ? String(raw.created_at).slice(0, 10) : new Date().toISOString().slice(0, 10));
+  const billingMonth = raw.billingMonth ?? raw.billing_month ?? (raw.billing_period_start ? String(raw.billing_period_start).slice(0, 7) : new Date().toISOString().slice(0, 7));
+  const dueDate = raw.dueDate ?? raw.due_date ?? (raw.billing_period_end ? String(raw.billing_period_end).slice(0, 10) : new Date().toISOString().slice(0, 10));
+  const issueDate = raw.issueDate ?? (raw.created_at ? String(raw.created_at).slice(0, 10) : (raw.createdAt ? String(raw.createdAt).slice(0, 10) : new Date().toISOString().slice(0, 10)));
 
   return {
     ...raw,
     id: raw.id || raw.invoice_id || raw.invoiceId || raw.invoiceNumber || String(raw._id || ''),
     invoiceNumber: raw.invoiceNumber || raw.invoice_number || raw.id,
-    customerId: raw.customerId || raw.customer_id || 'UNASSIGNED',
+    customerId: raw.customerId || raw.customer_id || (raw.hospitalId ? String(raw.hospitalId) : 'UNASSIGNED'),
     customerName: raw.customerName || raw.customer_name || raw.customer_id || 'Hospital Institution',
     customerGstin: raw.customerGstin || raw.customer_gstin || '07AAAAA0000A1Z5',
     customerAddress: raw.customerAddress || raw.customer_address || 'Main Hospital Campus',
@@ -1760,10 +1760,10 @@ export const normalizeInvoice = (raw: any): Invoice => {
     dueDate,
     status: (raw.status || 'PENDING_APPROVAL') as InvoiceStatus,
     surgeriesCount: Number(raw.surgeriesCount ?? raw.surgeries_count ?? 0),
-    totalMinutesUsed: Number(raw.totalMinutesUsed ?? raw.total_minutes ?? 0),
+    totalMinutesUsed: Number(raw.totalMinutesUsed ?? raw.total_minutes ?? raw.total_consumed_min ?? 0),
     baseMinutesUsed: Number(raw.baseMinutesUsed ?? raw.base_minutes_used ?? 0),
     incrementalMinutesUsed: Number(raw.incrementalMinutesUsed ?? raw.incremental_minutes_used ?? 0),
-    lineItems: (raw.lineItems || raw.line_items || []).map(normalizeLineItem),
+    lineItems: (raw.lineItems || raw.line_items || raw.items || []).map(normalizeLineItem),
     subtotal,
     cgstRatePct: raw.cgstRatePct ?? 9,
     cgstAmount: raw.cgstAmount ?? (totalTax / 2),
