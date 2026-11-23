@@ -551,8 +551,8 @@ export const BillingManagement: React.FC = () => {
             className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-xs text-white focus:border-blue-500 focus:outline-none"
           >
             <option value="ALL">All Institutions</option>
-            {customers.map(c => (
-              <option key={c.customer_id} value={c.customer_id}>{c.name}</option>
+            {customers.map((c, idx) => (
+              <option key={c.customer_id || idx} value={c.customer_id}>{c.name}</option>
             ))}
           </select>
 
@@ -594,8 +594,8 @@ export const BillingManagement: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredInvoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-white/5 transition-colors">
+                {filteredInvoices.map((inv, idx) => (
+                  <tr key={inv.id || inv.invoiceNumber || (inv as any).invoice_id || (inv as any).invoiceId || idx} className="hover:bg-white/5 transition-colors">
                     
                     {/* Invoice ID & Date */}
                     <td className="py-4 px-4">

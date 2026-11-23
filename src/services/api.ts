@@ -1747,7 +1747,7 @@ export const normalizeInvoice = (raw: any): Invoice => {
 
   return {
     ...raw,
-    id: raw.id,
+    id: raw.id || raw.invoice_id || raw.invoiceId || raw.invoiceNumber || String(raw._id || ''),
     invoiceNumber: raw.invoiceNumber || raw.invoice_number || raw.id,
     customerId: raw.customerId || raw.customer_id || 'UNASSIGNED',
     customerName: raw.customerName || raw.customer_name || raw.customer_id || 'Hospital Institution',
