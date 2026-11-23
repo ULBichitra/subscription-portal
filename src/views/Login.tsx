@@ -162,6 +162,12 @@ const Login: React.FC = () => {
         message: 'You were signed out after 15 minutes of inactivity for FDA 21 CFR Part 11 clinical security compliance.',
       };
     }
+    if (reason === 'unauthorized') {
+      return {
+        type: 'warning',
+        message: 'Access restricted: Your account does not have clinical portal authorization. Contact your administrator.',
+      };
+    }
     return null;
   }, [location.search]);
 

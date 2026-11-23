@@ -92,6 +92,25 @@ const Layout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
+  // Resilient role resolution
+  const userRole = user.role || 
+    (user.isPlatformAdmin || user.platformRoles?.includes('Platform Admin') || user.platformRoles?.includes('superadmin') ? 'superadmin' :
+    user.platformRoles?.some((r: string) => /technician|support|service/i.test(r)) ? 'field_support' :
+    user.platformRoles?.some((r: string) => /distributor/i.test(r)) ? 'subscription_manager' :
+    user.hospitalId ? 'hospital_admin' : '');
+
+  if (!userRole) {
+    localStorage.removeItem('portal_token');
+    localStorage.removeItem('portal_user');
+    return <Navigate to="/login?reason=unauthorized" replace />;
+  }
+
+  // Self-heal localStorage if role was missing
+  if (!user.role) {
+    user.role = userRole;
+    localStorage.setItem('portal_user', JSON.stringify(user));
+  }
+
   return (
     <div className="flex h-screen bg-[#09090b] text-zinc-100 overflow-hidden font-sans relative">
       {/* Background Orbs */}
@@ -106,7 +125,7 @@ const Layout: React.FC = () => {
       )}
 
       <Sidebar 
-        userRole={user.role} 
+        userRole={userRole} 
         mobileOpen={mobileMenuOpen}
         onMobileClose={() => setMobileMenuOpen(false)}
       />

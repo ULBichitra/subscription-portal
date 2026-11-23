@@ -1,3 +1,14 @@
+
+const normalizeRole = (r?: string): string => {
+  if (!r) return '';
+  const s = r.toLowerCase().trim().replace(/[\s-]+/g, '_');
+  if (s === 'superadmin' || s === 'platform_admin' || s.includes('super')) return 'superadmin';
+  if (s.includes('technician') || s.includes('support') || s.includes('service') || s.includes('biomed')) return 'field_support';
+  if (s.includes('distributor') || s === 'subscription_manager') return 'subscription_manager';
+  if (s.includes('hospital') || s === 'hospital_admin') return 'hospital_admin';
+  return s;
+};
+
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
@@ -209,7 +220,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userRole, mobileOpen = false, onMobil
         {/* Grouped High-Tech Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4 overflow-x-hidden">
           {navGroups.map((group) => {
-            const visibleItems = group.items.filter(item => item.roles.includes(userRole));
+            const effectiveRole = normalizeRole(userRole);
+            const visibleItems = group.items.filter(item => item.roles.includes(effectiveRole));
             if (visibleItems.length === 0) return null;
 
             return (
