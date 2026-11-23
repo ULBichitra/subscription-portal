@@ -127,7 +127,7 @@ const SubscriptionManagement: React.FC = () => {
       header: 'Sub ID', 
       accessor: (row: Subscription) => (
         <span className="font-mono text-xs cursor-pointer text-blue-400 hover:underline" onClick={() => setSelectedSub(row)}>
-          {row.subscription_id.substring(0, 8)}...
+          {(row.subscription_id || (row as any).subscriptionId || String((row as any)._id || "") || "SUB-0000").substring(0, 8)}...
         </span>
       )
     },

@@ -530,7 +530,20 @@ export const reactivateTower = async (towerId: string) => {
 export const getSubscriptions = async (): Promise<Subscription[]> => {
   const response = await api.get('/portal/subscriptions');
   const d = response.data;
-  return Array.isArray(d) ? d : (d?.subscriptions || []);
+  const rawList: any[] = Array.isArray(d) ? d : (d?.subscriptions || []);
+  return rawList.map((item: any) => ({
+    ...item,
+    subscription_id: item.subscription_id || item.subscriptionId || String(item._id || '') || 'SUB-0000',
+    tower_id: item.tower_id || item.towerId || '',
+    customer_id: item.customer_id || item.hospitalId ? String(item.customer_id || item.hospitalId) : null,
+    sub_type: item.sub_type || item.subType || 'POSTPAID',
+    status: item.status || 'ACTIVE',
+    balance_min: item.balance_min ?? item.balanceMin ?? null,
+    grace_min: item.grace_min ?? item.graceMin ?? 960,
+    used_min: item.used_min ?? item.usedMin ?? 0,
+    start_date: item.start_date || item.startDate || item.createdAt || '',
+    end_date: item.end_date || item.endDate || null,
+  }));
 };
 
 export const approveSubscription = async (sub_id: string): Promise<Subscription> => {
