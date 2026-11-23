@@ -194,9 +194,14 @@ class RealtimeClient {
     if (this.sse) return;
 
     const apiBase = getApiBaseUrl();
-    const sseUrl = apiBase
+    let sseUrl = apiBase
       ? (apiBase.endsWith('/api') ? `${apiBase}/portal/events` : `${apiBase}/api/portal/events`)
       : '/api/portal/events';
+
+    const token = typeof localStorage !== 'undefined' ? (localStorage.getItem('portal_token') || localStorage.getItem('token')) : null;
+    if (token) {
+      sseUrl += `${sseUrl.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+    }
 
     try {
       this.sse = new EventSource(sseUrl);
@@ -238,7 +243,12 @@ class RealtimeClient {
 
     const pollOnce = async () => {
       try {
-        const res = await fetch(pollUrl);
+        const token = typeof localStorage !== 'undefined' ? (localStorage.getItem('portal_token') || localStorage.getItem('token')) : null;
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetch(pollUrl, { headers });
         if (res.ok) {
           const json = await res.json();
           const towers = Array.isArray(json) ? json : json.data || json.towers || [];

@@ -14,6 +14,7 @@ export function initKioskSecurity(): void {
 
   // 2. Intercept DevTools and Browser Inspection Keyboard Shortcuts
   window.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (!e.key) return;
     const key = e.key.toUpperCase();
     const ctrlOrCmd = e.ctrlKey || e.metaKey;
     const shift = e.shiftKey;

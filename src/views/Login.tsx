@@ -206,7 +206,8 @@ const Login: React.FC = () => {
     };
 
     const initGIS = () => {
-      if (window.google?.accounts?.id) {
+      if (window.google?.accounts?.id && !(window as any).__gsi_init__) {
+        (window as any).__gsi_init__ = true;
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: onGoogleCallback,

@@ -144,7 +144,7 @@ const Dashboard: React.FC = () => {
   const monotonicClocksRef = useRef<Map<string, { lastServerSec: number | null; lastSec: number; localMs: number }>>(new Map());
 
   const hasActiveSurgeries = useMemo(() => {
-    return towers.some((t) => Boolean(t.is_online && t.is_surgery_active));
+    return Array.isArray(towers) ? towers.some((t) => Boolean(t.is_online && t.is_surgery_active)) : false;
   }, [towers]);
 
   const getMonotonicElapsedSec = useCallback((tower: Tower, activeSession?: Session | null): number => {

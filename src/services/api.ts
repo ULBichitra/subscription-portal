@@ -426,7 +426,8 @@ export interface Recharge {
 
 export const getTowers = async (): Promise<Tower[]> => {
   const response = await api.get('/portal/towers');
-  return response.data;
+  const d = response.data;
+  return Array.isArray(d) ? d : (d?.towers || []);
 };
 
 export const registerTower = async (
@@ -528,7 +529,8 @@ export const reactivateTower = async (towerId: string) => {
 
 export const getSubscriptions = async (): Promise<Subscription[]> => {
   const response = await api.get('/portal/subscriptions');
-  return response.data;
+  const d = response.data;
+  return Array.isArray(d) ? d : (d?.subscriptions || []);
 };
 
 export const approveSubscription = async (sub_id: string): Promise<Subscription> => {
@@ -543,7 +545,8 @@ export const suspendSubscription = async (sub_id: string): Promise<Subscription>
 
 export const getSessions = async (): Promise<Session[]> => {
   const response = await api.get('/portal/sessions');
-  return response.data;
+  const d = response.data;
+  return Array.isArray(d) ? d : (d?.sessions || []);
 };
 
 export const getSessionTimeline = async (session_id: string): Promise<SessionTimeline> => {
@@ -553,7 +556,8 @@ export const getSessionTimeline = async (session_id: string): Promise<SessionTim
 
 export const getCustomers = async (): Promise<Customer[]> => {
   const response = await api.get('/portal/customers');
-  return response.data;
+  const d = response.data;
+  return Array.isArray(d) ? d : (d?.customers || []);
 };
 
 export const createCustomer = async (data: Partial<Customer>): Promise<{ message?: string; customer_id?: string; distributor_id?: string }> => {
@@ -676,7 +680,8 @@ export const rejectPlanChangeRequest = async (requestId: string, reason?: string
 
 export const getPortalNotifications = async (): Promise<PortalNotification[]> => {
   const response = await api.get('/portal/notifications');
-  return response.data;
+  const d = response.data;
+  return Array.isArray(d) ? d : (d?.notifications || []);
 };
 
 export const assignLease = async (tower_id: string, years: number, months: number, days: number): Promise<any> => {
