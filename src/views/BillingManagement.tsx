@@ -329,7 +329,14 @@ export const BillingManagement: React.FC = () => {
 
   const handleOpenApproveModal = (inv: Invoice) => {
     setApprovingInvoice(inv);
-    setApproveReason('Verified and approved onboarding advance invoice.');
+    const isZero = Number(inv.totalPayable ?? 0) <= 0 || Boolean(inv.noPaymentRequired);
+    if (isZero) {
+      setApproveReason('Verified: Zero usage statement approved for customer visibility (No payment required)');
+    } else {
+      setApproveReason(inv.invoiceNumber.startsWith('ADV-')
+        ? 'Verified and approved onboarding advance invoice.'
+        : 'Verified monthly surgical usage against physical OT records.');
+    }
     setApproveAdjustment(0);
     setApproveNotes('');
     setIsApproveModalOpen(true);
@@ -361,7 +368,15 @@ export const BillingManagement: React.FC = () => {
     }
   };
 
-  const getStatusPill = (status: InvoiceStatus) => {
+  const getStatusPill = (status: InvoiceStatus, inv?: Invoice) => {
+    const isZero = inv ? (Number(inv.totalPayable ?? 0) <= 0 || Boolean(inv.noPaymentRequired)) : false;
+    if (status === 'APPROVED' && isZero) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <CheckCircle2 className="w-3 h-3 text-emerald-400" /> NO PAYMENT REQUIRED
+        </span>
+      );
+    }
     switch (status) {
       case 'PENDING_APPROVAL':
         return (
@@ -643,7 +658,7 @@ export const BillingManagement: React.FC = () => {
 
                     {/* Status */}
                     <td className="py-4 px-4">
-                      {getStatusPill(inv.status)}
+                      {getStatusPill(inv.status, inv)}
                     </td>
 
                     {/* Action buttons */}
@@ -660,7 +675,7 @@ export const BillingManagement: React.FC = () => {
                         </button>
                       )}
 
-                      {inv.status !== 'PAID' && inv.status !== 'PENDING_APPROVAL' && (
+                      {inv.status !== 'PAID' && inv.status !== 'PENDING_APPROVAL' && Number(inv.totalPayable ?? 0) > 0 && !inv.noPaymentRequired && (
                         <button
                           onClick={() => handleOpenRecordPayment(inv)}
                           className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold transition-colors cursor-pointer"
@@ -1020,6 +1035,12 @@ export const BillingManagement: React.FC = () => {
                     ₹{(approvingInvoice.totalPayable ?? (approvingInvoice as any).total_amount ?? (approvingInvoice as any).net_payable ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
+                {(Number(approvingInvoice.totalPayable ?? 0) <= 0 || Boolean(approvingInvoice.noPaymentRequired)) && (
+                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Zero Usage Statement — Approving will publish this with status <strong>NO PAYMENT REQUIRED</strong>.</span>
+                  </div>
+                )}
               </div>
 
               {/* Approval Reason (Mandatory per FDA 21 CFR Part 11 / backend requirement) */}
@@ -1048,10 +1069,13 @@ export const BillingManagement: React.FC = () => {
                   type="number"
                   min="0"
                   step="0.01"
+                  disabled={Number(approvingInvoice.totalPayable ?? 0) <= 0 || Boolean(approvingInvoice.noPaymentRequired)}
                   value={approveAdjustment}
                   onChange={(e) => setApproveAdjustment(parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-green-500 focus:outline-none font-mono"
+                  className={`w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-green-500 focus:outline-none font-mono ${
+                    (Number(approvingInvoice.totalPayable ?? 0) <= 0 || Boolean(approvingInvoice.noPaymentRequired)) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 

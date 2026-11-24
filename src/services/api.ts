@@ -1638,6 +1638,7 @@ export interface Invoice {
   
   hsnSacCode: string; // "997312"
   sha256Seal: string;
+  noPaymentRequired?: boolean;
   qrPayload: string;
   notes?: string;
   terms?: string;
@@ -1739,10 +1740,11 @@ export const normalizeInvoice = (raw: any): Invoice => {
   const subtotal = Number(raw.subtotal ?? raw.base_amount ?? raw.subtotalAmount ?? 0);
   const totalTax = Number(raw.totalTax ?? raw.taxGst18 ?? raw.tax_amount ?? raw.total_tax ?? raw.tax_gst_amount ?? (subtotal * 0.18));
   const totalPayable = Number(raw.totalPayable ?? raw.totalAmount ?? raw.total_amount ?? raw.amount_due ?? raw.net_payable ?? (subtotal + totalTax));
+  const isZeroAmount = totalPayable <= 0;
   const amountPaid = Number(raw.amountPaid ?? raw.amount_paid ?? 0);
-  const balanceDue = Number(raw.balanceDue ?? raw.balance_due ?? (totalPayable - amountPaid));
+  const balanceDue = isZeroAmount ? 0 : Number(raw.balanceDue ?? raw.balance_due ?? (totalPayable - amountPaid));
   const billingMonth = raw.billingMonth ?? raw.billing_month ?? (raw.billing_period_start ? String(raw.billing_period_start).slice(0, 7) : new Date().toISOString().slice(0, 7));
-  const dueDate = raw.dueDate ?? raw.due_date ?? (raw.billing_period_end ? String(raw.billing_period_end).slice(0, 10) : new Date().toISOString().slice(0, 10));
+  const dueDate = isZeroAmount ? 'N/A (Nil Balance)' : (raw.dueDate ?? raw.due_date ?? (raw.billing_period_end ? String(raw.billing_period_end).slice(0, 10) : new Date().toISOString().slice(0, 10)));
   const issueDate = raw.issueDate ?? (raw.created_at ? String(raw.created_at).slice(0, 10) : (raw.createdAt ? String(raw.createdAt).slice(0, 10) : new Date().toISOString().slice(0, 10)));
 
   return {
@@ -1777,7 +1779,8 @@ export const normalizeInvoice = (raw: any): Invoice => {
     balanceDue,
     hsnSacCode: raw.hsnSacCode || '997312',
     sha256Seal: raw.sha256Seal || raw.sha256_seal || '',
-    qrPayload: raw.qrPayload || raw.qr_payload || ''
+    qrPayload: raw.qrPayload || raw.qr_payload || '',
+    noPaymentRequired: isZeroAmount || Boolean(raw.noPaymentRequired ?? raw.no_payment_required)
   };
 };
 

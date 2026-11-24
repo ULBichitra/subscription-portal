@@ -94,7 +94,16 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({
     alert('Cryptographic SHA-256 seal copied to clipboard.');
   };
 
+  const isZeroAmount = Number(invoice.totalPayable ?? 0) <= 0 || Boolean(invoice.noPaymentRequired);
+
   const getStatusBadge = (status: string) => {
+    if (status === 'APPROVED' && isZeroAmount) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <CheckCircle className="w-3.5 h-3.5" /> NO PAYMENT REQUIRED
+        </span>
+      );
+    }
     switch (status) {
       case 'PENDING_APPROVAL':
         return (
@@ -166,7 +175,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({
               </button>
             )}
 
-            {invoice.status !== 'PAID' && invoice.status !== 'PENDING_APPROVAL' && onRecordPayment && (
+            {invoice.status !== 'PAID' && invoice.status !== 'PENDING_APPROVAL' && !isZeroAmount && onRecordPayment && (
               <button
                 onClick={() => onRecordPayment(invoice)}
                 className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-1.5"
@@ -224,7 +233,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({
               <div className="space-y-1 text-xs">
                 <p className="font-bold text-zinc-900 text-sm">{invoice.invoiceNumber}</p>
                 <p><span className="text-zinc-500">Invoice Date:</span> <span className="font-semibold text-zinc-800">{invoice.issueDate}</span></p>
-                <p><span className="text-zinc-500">Payment Due:</span> <span className="font-semibold text-rose-700">{invoice.dueDate}</span></p>
+                <p><span className="text-zinc-500">Payment Due:</span> <span className={`font-semibold ${isZeroAmount ? 'text-emerald-700' : 'text-rose-700'}`}>{isZeroAmount ? 'N/A (Nil Balance)' : invoice.dueDate}</span></p>
                 <p><span className="text-zinc-500">Billing Period:</span> <span className="font-semibold text-zinc-800">{invoice.billingMonth}</span></p>
                 <p><span className="text-zinc-500">Place of Supply:</span> <span className="font-semibold text-zinc-800">{invoice.customerAddress.includes('Haryana') ? '06-Haryana' : '07-Delhi'}</span></p>
                 <div className="pt-1 flex justify-end">
@@ -321,21 +330,33 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({
                 <p className="font-bold text-zinc-900 mt-0.5">{numberToWords(invoice.totalPayable)}</p>
               </div>
 
-              {/* Bank Details for Direct Transfer */}
-              <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/80 text-blue-950">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700 mb-1.5 flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5" />
-                  Beneficiary Bank Account Details (NEFT / RTGS)
-                </p>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[11px]">
-                  <div><span className="text-zinc-500 font-sans">Account Name:</span> <span className="font-bold">UnivLabs Technologies Pvt Ltd</span></div>
-                  <div><span className="text-zinc-500 font-sans">Bank Name:</span> <span className="font-bold">HDFC Bank Ltd</span></div>
-                  <div><span className="text-zinc-500 font-sans">Account No:</span> <span className="font-bold text-blue-900">50200028194821</span></div>
-                  <div><span className="text-zinc-500 font-sans">IFSC Code:</span> <span className="font-bold text-blue-900">HDFC0000240</span></div>
-                  <div><span className="text-zinc-500 font-sans">Branch:</span> <span>Green Park, New Delhi 110016</span></div>
-                  <div><span className="text-zinc-500 font-sans">Account Type:</span> <span>Current Account</span></div>
+              {/* Bank Details or Nil Balance Notice */}
+              {isZeroAmount ? (
+                <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1 flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                    Settled / Nil Balance - No Payment Required
+                  </p>
+                  <p className="text-[11px] text-emerald-800 leading-relaxed font-sans">
+                    Zero optical and SaaS usage recorded for this billing period. No remittance or wire transfer is required from the institution.
+                  </p>
                 </div>
-              </div>
+              ) : (
+                <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/80 text-blue-950">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700 mb-1.5 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5" />
+                    Beneficiary Bank Account Details (NEFT / RTGS)
+                  </p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[11px]">
+                    <div><span className="text-zinc-500 font-sans">Account Name:</span> <span className="font-bold">UnivLabs Technologies Pvt Ltd</span></div>
+                    <div><span className="text-zinc-500 font-sans">Bank Name:</span> <span className="font-bold">HDFC Bank Ltd</span></div>
+                    <div><span className="text-zinc-500 font-sans">Account No:</span> <span className="font-bold text-blue-900">50200028194821</span></div>
+                    <div><span className="text-zinc-500 font-sans">IFSC Code:</span> <span className="font-bold text-blue-900">HDFC0000240</span></div>
+                    <div><span className="text-zinc-500 font-sans">Branch:</span> <span>Green Park, New Delhi 110016</span></div>
+                    <div><span className="text-zinc-500 font-sans">Account Type:</span> <span>Current Account</span></div>
+                  </div>
+                </div>
+              )}
 
               {/* Cryptographic Verification Seal */}
               <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-200">
